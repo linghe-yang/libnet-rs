@@ -253,10 +253,10 @@ where
                     waiter.reset();
 
                     let error = self.keep_alive(stream).await;
-                    log::warn!("Keep alive error for {}: {}", self.address, error);
+                    log::debug!("Keep alive error for {}: {}", self.address, error);
                 },
                 Err(e) => {
-                    log::warn!(
+                    log::debug!(
                         "Failed to connect {} (Attempt: {}) with error {}", self.address, 
                         waiter.attempt(), 
                         e

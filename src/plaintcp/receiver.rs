@@ -54,12 +54,12 @@ where
                         handler.dispatch(new_msg, &mut writer).await;
                     },
                     Err(e) => {
-                        log::warn!("Connection error for Peer {}: {}", peer_address, e);
+                        log::debug!("Connection error for Peer {}: {}", peer_address, e);
                         return;
                     }
                 }
             }
-            log::warn!("Connection closed by peer");
+            log::debug!("Connection closed by peer");
         });
     }
 
@@ -72,7 +72,7 @@ where
         loop {
             let (sock, peer_addr) = match listener.accept().await {
                 Err(e) => {
-                    log::warn!("Listener error: {}", e);
+                    log::debug!("Listener error: {}", e);
                     return;
                 },
                 Ok(x) => x,

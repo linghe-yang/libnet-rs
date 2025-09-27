@@ -93,7 +93,7 @@ where
                 (reader, writer)
             },
             Err(e) => {
-                log::warn!("Unable to connect to peer {} with error {}", self.address, e);
+                log::debug!("Unable to connect to peer {} with error {}", self.address, e);
                 return;
             }
         };
@@ -106,7 +106,7 @@ where
                 // The outside world asked me to send a message
                 Some(msg) = self.receiver.recv() => {
                     if let Err(e) = writer.send(msg).await {
-                        log::warn!("Unable to send any message outside the system with error: {}", e.to_string());
+                        log::debug!("Unable to send any message outside the system with error: {}", e.to_string());
                         return;
                     }
                 },
@@ -117,7 +117,7 @@ where
                             // Kill the response
                         }
                         _ => {
-                            log::warn!("Connection gone awry!");
+                            log::debug!("Connection gone awry!");
                             return;
                         }
                     }
@@ -138,7 +138,7 @@ where
         log::debug!("Async Sending {:?} to {:?}", msg, sender);
         let addr_opt = self.address_map.get(&sender);
         if addr_opt.is_none() {
-            log::warn!("Unknown peer {:?}", sender);
+            log::debug!("Unknown peer {:?}", sender);
             return;
         }
         let address = addr_opt.unwrap();
@@ -168,7 +168,7 @@ where
         log::debug!("Blocking Sending {:?} to {:?}", msg, sender);
         let addr_opt = self.address_map.get(&sender);
         if addr_opt.is_none() {
-            log::warn!("Unknown peer {:?}", sender);
+            log::debug!("Unknown peer {:?}", sender);
             return;
         }
         let address = addr_opt.unwrap();
