@@ -67,7 +67,6 @@ where I:Message,
     fn encode(&mut self, item: I, dst:&mut BytesMut) -> Result<(),Self::Error> {
         let data = I::to_bytes(&item);
         let buf = Bytes::from(data);
-        log::warn!("Send {} bytes", buf.len());
         self.0.encode(buf, dst)
     }
 }
