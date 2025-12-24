@@ -33,16 +33,16 @@ where
         Box::new(writer) as Writer<SendMsg>
     }
 
-    fn spawn_runner(socket: TcpStream, peer_address: SocketAddr, handler: MsgHandler) 
+    fn spawn_runner(socket: TcpStream, peer_address: SocketAddr, handler: MsgHandler)
     {
         tokio::spawn(async move {
             let (rd, wr) = socket.into_split();
             let mut reader = FramedRead::new(
-                rd, 
+                rd,
                 Decodec::<RecvMsg>::new()
             );
             let writer = FramedWrite::new(
-                wr, 
+                wr,
                 EnCodec::<SendMsg>::new()
             );
             let mut writer = Self::into_sink(writer); // Convert to dynamic type
@@ -63,21 +63,42 @@ where
         });
     }
 
+    // async fn run(&self) {
+    //     let listener = TcpListener::bind(self.address)
+    //         .await
+    //         .expect("Failed to bind to address");
+    //
+    //     log::debug!("TCP Receiver is listening on {}", self.address);
+    //     loop {
+    //         let (sock, peer_addr) = match listener.accept().await {
+    //             Err(e) => {
+    //                 log::debug!("Listener error: {}", e);
+    //                 return;
+    //             },
+    //             Ok(x) => x,
+    //         };
+    //         log::info!("Connected to {}", peer_addr);
+    //         Self::spawn_runner(sock, peer_addr, self.handler.clone());
+    //     }
+    // }
     async fn run(&self) {
         let listener = TcpListener::bind(self.address)
             .await
             .expect("Failed to bind to address");
 
         log::debug!("TCP Receiver is listening on {}", self.address);
+
         loop {
             let (sock, peer_addr) = match listener.accept().await {
+                Ok((sock, addr)) => (sock, addr),
                 Err(e) => {
-                    log::debug!("Listener error: {}", e);
-                    return;
-                },
-                Ok(x) => x,
+                    log::error!("Accept error: {}. Retrying in 1 second...", e);
+                    tokio::time::sleep(tokio::time::Duration::from_secs(1)).await;
+                    continue;
+                }
             };
-            log::info!("Connected to {}", peer_addr);
+
+            log::debug!("Accepted connection from {}", peer_addr);
             Self::spawn_runner(sock, peer_addr, self.handler.clone());
         }
     }
