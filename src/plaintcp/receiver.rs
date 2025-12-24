@@ -92,8 +92,8 @@ where
             let (sock, peer_addr) = match listener.accept().await {
                 Ok((sock, addr)) => (sock, addr),
                 Err(e) => {
-                    log::error!("Accept error: {}. Retrying in 1 second...", e);
-                    tokio::time::sleep(tokio::time::Duration::from_secs(1)).await;
+                    log::error!("Accept error: {}. Retrying...", e);
+                    tokio::time::sleep(tokio::time::Duration::from_millis(100)).await;
                     continue;
                 }
             };
